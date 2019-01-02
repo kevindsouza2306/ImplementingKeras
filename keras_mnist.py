@@ -10,4 +10,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 
-np.random.randn(1)
+ap = argparse.ArgumentParser()
+ap.add_argument("-o", "--output", required=True, help="path to the output loss/accuracy plot")
+args = vars(ap.parse_args())
+
+print("[INFO] Loading MNIST (full) dataset....")
+datasets = datasets.fetch_mldata("MNIST Original")
+data = datasets.data.astype("float") / 255.0
+(trainX, testX, trainY, testY) = train_test_split(data, datasets.target, test_size=0.25)\
+
+lb = LabelBinarizer
+testY = lb.fit_transform(testY)
+trainY = lb.fit_transform(trainY)
