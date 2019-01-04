@@ -15,11 +15,13 @@ ap.add_argument("-o", "--output", required=True, help="path to the output loss/a
 args = vars(ap.parse_args())
 
 print("[INFO] Loading MNIST (full) dataset....")
-datasets = datasets.fetch_mldata("MNIST Original")
-data = datasets.data.astype("float") / 255.0
-(trainX, testX, trainY, testY) = train_test_split(data, datasets.target, test_size=0.25)
 
-lb = LabelBinarizer
+dataset = datasets.fetch_mldata("MNIST Original")
+
+data = dataset.data.astype("float") / 255.0
+(trainX, testX, trainY, testY) = train_test_split(data, dataset.target, test_size=0.25)
+
+lb = LabelBinarizer()
 testY = lb.fit_transform(testY)
 trainY = lb.fit_transform(trainY)
 
@@ -32,13 +34,13 @@ print("[INFO] Training Network...")
 
 sgd = SGD(0.01)
 
-model.compile(loss="categorial_crossentropy", optimizer=sgd, metrics=["accuracy"])
+model.compile(loss="categorical_crossentropy", optimizer=sgd, metrics=["accuracy"])
 
 H = model.fit(trainX, trainY, validation_data=(testX, testY), epochs=100, batch_size=128)
 
 print("[INFO] evaluating network")
 predection = model.predict(testX, batch_size=128)
-print(classification_report(testY.argmx(axis=1), predection.argmax(axis=1), target_names=[str(x) for x in lb.classes_]))
+print(classification_report(testY.argmax(axis=1), predection.argmax(axis=1), target_names=[str(x) for x in lb.classes_]))
 
 plt.style.use("ggplot")
 plt.figure()
@@ -48,7 +50,7 @@ plt.plot(np.arange(0, 100), H.history["acc"], label="train_acc")
 plt.plot(np.arange(0, 100), H.history["val_acc"], label="val_acc")
 
 plt.title("Trainning Loss and Accuracy")
-plt.xlable("Epoch #")
-plt.ylable("Loss/Accuracy")
+plt.xlabel("Epoch #")
+plt.ylabel("Loss/Accuracy")
 plt.legend()
-plt.savefig(args("output"))
+plt.savefig(args["output"])
